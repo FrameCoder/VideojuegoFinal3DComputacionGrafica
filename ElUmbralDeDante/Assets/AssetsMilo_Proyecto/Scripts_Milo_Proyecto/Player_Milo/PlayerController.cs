@@ -26,11 +26,17 @@ public class PlayerController : MonoBehaviour
     private Vector3 _moveDirection;
     private float _fallVelocity;
 
+    [SerializeField] private float bobSpeed = 5f;
+    [SerializeField] private float bobAmount = 0.05f;
+    private float defaultCamY;
+    private float bobTimer = 0f;
+
     private void Awake()
     {
         _player = GetComponent<CharacterController>();
         Cursor.lockState = CursorLockMode.Locked; // Oculta y bloquea el cursor
         _originalCameraLocalPos = _cameraHolder.localPosition;
+        defaultCamY = _originalCameraLocalPos.y + (_isCrouching ? _crouchCameraOffset : 0f);
     }
 
     private void Update()
@@ -56,6 +62,8 @@ public class PlayerController : MonoBehaviour
         ApplyGravity();
 
         _player.Move(_moveDirection * Time.deltaTime);
+
+        HandleHeadBobbing();
     }
 
     private void ApplyGravity()
@@ -111,6 +119,24 @@ public class PlayerController : MonoBehaviour
         // Suaviza la cámara hacia abajo
         Vector3 targetCameraPos = _originalCameraLocalPos + (_isCrouching ? Vector3.up * _crouchCameraOffset : Vector3.zero);
         _cameraHolder.localPosition = Vector3.Lerp(_cameraHolder.localPosition, targetCameraPos, Time.deltaTime * 10f);
+    }
+
+    private void HandleHeadBobbing()
+    {
+        if (_player.isGrounded && (_moveDirection.x != 0 || _moveDirection.z != 0))
+        {
+            bobTimer += Time.deltaTime * bobSpeed;
+            float newY = defaultCamY + Mathf.Sin(bobTimer) * bobAmount;
+            Vector3 localPos = _cameraHolder.localPosition;
+            _cameraHolder.localPosition = new Vector3(localPos.x, newY, localPos.z);
+        }
+        else
+        {
+            // Vuelve a la posición base suavemente
+            Vector3 localPos = _cameraHolder.localPosition;
+            _cameraHolder.localPosition = new Vector3(localPos.x, Mathf.Lerp(localPos.y, defaultCamY, Time.deltaTime * bobSpeed), localPos.z);
+            bobTimer = 0f;
+        }
     }
 }
 

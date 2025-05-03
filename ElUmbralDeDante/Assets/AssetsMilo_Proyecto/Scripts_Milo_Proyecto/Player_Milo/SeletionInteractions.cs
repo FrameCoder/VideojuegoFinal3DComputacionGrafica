@@ -10,7 +10,8 @@ public class SeletionInteractions : MonoBehaviour
 
     public GameObject textPressE;
     GameObject ultimoReconocido = null;
-    private Material ultimoMaterialOriginal = null;
+    //private Material ultimoMaterialOriginal = null;
+    selectorVisual SelectorVisual;
 
     void Start()
     {
@@ -52,11 +53,10 @@ public class SeletionInteractions : MonoBehaviour
 
     void SelectedObject(Transform transform)
     {
-        MeshRenderer mr = transform.GetComponent<MeshRenderer>();
-        if (mr != null)
+        SelectorVisual = transform.GetComponent<selectorVisual>();
+        if (SelectorVisual != null)
         {
-            ultimoMaterialOriginal = mr.material; // Guarda el material original completo
-            mr.material.color = Color.red;
+            SelectorVisual.ActivarResaltado();
         }
 
         ultimoReconocido = transform.gameObject;
@@ -67,17 +67,17 @@ public class SeletionInteractions : MonoBehaviour
     {
         if (ultimoReconocido)
         {
-            MeshRenderer mr = ultimoReconocido.GetComponent<MeshRenderer>();
-            if (mr != null && ultimoMaterialOriginal != null)
+            SelectorVisual = ultimoReconocido.GetComponent<selectorVisual>();
+            if (SelectorVisual != null)
             {
-                mr.material = ultimoMaterialOriginal;
+                SelectorVisual.DesactivarResaltado();
             }
 
             textPressE.SetActive(false);
         }
 
         ultimoReconocido = null;
-        ultimoMaterialOriginal = null;
+        SelectorVisual = null;
     }
 }
 
