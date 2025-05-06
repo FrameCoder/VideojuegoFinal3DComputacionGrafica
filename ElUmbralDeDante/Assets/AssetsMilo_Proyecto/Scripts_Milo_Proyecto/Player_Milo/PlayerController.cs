@@ -9,6 +9,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float _moveSpeed = 5f;
     [SerializeField] private float _runSpeed = 10f;
     [SerializeField] private float _actualSpeed;
+    [SerializeField] private float _speedLerpFactor = 5f;
     [SerializeField] private float _gravity = 9.81f;
     [SerializeField] private float _jumpHeight = 2f;
     [SerializeField] private float _mouseSensitivity = 2f;
@@ -52,7 +53,10 @@ public class PlayerController : MonoBehaviour
         float moveZ = Input.GetAxis("Vertical");
 
         isRunning = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
-        _actualSpeed = isRunning ? _runSpeed : _moveSpeed;
+        float targetSpeed = isRunning ? _runSpeed : _moveSpeed;
+        _actualSpeed = Mathf.Lerp(_actualSpeed, targetSpeed, Time.deltaTime * _speedLerpFactor);
+        //_actualSpeed = isRunning ? _runSpeed : _moveSpeed;
+        //_actualSpeed = Mathf.Lerp(_actualSpeed, _moveSpeed, Time.deltaTime * _speedLerpFactor);
 
 
         Vector3 move = transform.right * moveX + transform.forward * moveZ;
